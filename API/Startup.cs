@@ -18,6 +18,7 @@ using Application.Posts;
 using AutoMapper;
 using Application.Core;
 using API.Extensions;
+using FluentValidation.AspNetCore;
 
 
 namespace API
@@ -36,7 +37,13 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers().AddFluentValidation(config => 
+            {
+                // Here we can register the classes where fluent validation is applied.
+                // validation needs to be tied to the controllers as they format the response that
+                // comes back.
+                config.RegisterValidatorsFromAssemblyContaining<PostCreate>();
+            });
             services.AddApplicationServices(_config);
         }
 

@@ -4,17 +4,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain;
 using System;
+using Application.Core;
+
 
 namespace Application.Posts
 {
     public class PostDetails
     {
-        public class Query : IRequest<Post>
+        public class Query : IRequest<HandlerResult<Post>>
         {
             public Guid Id { get; set; }
         }
 
-        public class Handler : IRequestHandler<Query, Post>
+        public class Handler : IRequestHandler<Query, HandlerResult<Post>>
         {
             private readonly DataContext _context;
 
@@ -23,9 +25,10 @@ namespace Application.Posts
                 _context = context;
             }
 
-            public async Task<Post> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<HandlerResult<Post>> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.Posts.FindAsync(request.Id);
+                Post post = await _context.Posts.FindAsync(request.Id);
+                return HandlerResult<Post>.Success(post);
             }
         }
     }

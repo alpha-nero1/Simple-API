@@ -15,6 +15,7 @@ Everything starts with the domain.
 ## Application Layer
 Has a dependency on the domain and sits above the Domain
 - Responsbile for business logic.
+- Do validation here.
 
 ## Api Layer
 Has dependency on Application layer.

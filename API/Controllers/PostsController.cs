@@ -12,16 +12,16 @@ namespace API.Controllers
     public class PostsController : BaseApiController
     {
         [HttpGet]
-        public async Task<ActionResult<List<Post>>> GetPosts()
+        public async Task<IActionResult> GetPosts()
         {
-            return await Mediator.Send(new PostList.Query());
+            return HandleResult(await Mediator.Send(new PostList.Query()));
         }
 
         // Get a single post.
         [HttpGet("{id}")]
-        public async Task<ActionResult<Post>> GetPost(Guid id)
+        public async Task<IActionResult> GetPost(Guid id)
         {
-            return await Mediator.Send(new PostDetails.Query { Id = id });
+            return HandleResult(await Mediator.Send(new PostDetails.Query { Id = id }));
         }
 
         // Because of ApiController attribute, dotnet knows to get the
@@ -30,20 +30,20 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreatePost(Post post)
         {
-            return Ok(await Mediator.Send(new PostCreate.Command { Post = post }));
+            return HandleResult(await Mediator.Send(new PostCreate.Command { Post = post }));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> EditPost(Guid id, Post post)
         {
             post.Id = id;
-            return Ok(await Mediator.Send(new PostEdit.Command { Post = post }));
+            return HandleResult(await Mediator.Send(new PostEdit.Command { Post = post }));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(Guid id)
         {
-            return Ok(await Mediator.Send(new PostDelete.Command { Id = id }));
+            return HandleResult(await Mediator.Send(new PostDelete.Command { Id = id }));
         }
     }
 }

@@ -10,12 +10,12 @@ namespace Application.Posts
 {
     public class PostEdit
     {
-        public class Command : IRequest
+        public class Command : IRequest<HandlerResult<Unit>>
         {
             public Post Post { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, HandlerResult<Unit>>
         {
             private readonly DataContext _context;
             private readonly IMapper _mapper;
@@ -26,13 +26,15 @@ namespace Application.Posts
                 _mapper = mapper;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<HandlerResult<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
                 Post post = await _context.Posts.FindAsync(request.Post.Id);
+                if (post == null) return null;
                 // Map from source object into destination object.
                 _mapper.Map(request.Post, post);
-                await _context.SaveChangesAsync();
-                return Unit.Value;
+                bool success = await _context.SaveChangesAsync() > 0;
+                if (!success) return HandlerResult<Unit>.Failure("Failure to edit post.");
+                return HandlerResult<Unit>.Success(Unit.Value);
             }
         }
     }

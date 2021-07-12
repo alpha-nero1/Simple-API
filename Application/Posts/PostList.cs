@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Application.Core;
 
 
 namespace Application.Posts
@@ -15,15 +16,12 @@ namespace Application.Posts
     {
         // This is simply the class that represents the request and what it looks like.
         // This class is what will be sent through via Mediator.Send()
-        public class Query : IRequest<List<Post>> 
-        {
-
-        }
+        public class Query : IRequest<HandlerResult<List<Post>>> {}
 
         // This is simple the class that actually handles the request and returns a response.
         // This class is what will process the Mediator.Send() request.
         // It is NOT invoked directly, ever!
-        public class Handler: IRequestHandler<Query, List<Post>>
+        public class Handler: IRequestHandler<Query, HandlerResult<List<Post>>>
         {
             private readonly DataContext _context;
             
@@ -32,9 +30,9 @@ namespace Application.Posts
                 _context = context;
             }
 
-            public async Task<List<Post>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<HandlerResult<List<Post>>> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.Posts.ToListAsync(cancellationToken);
+                return HandlerResult<List<Post>>.Success(await _context.Posts.ToListAsync(cancellationToken));
             }
         }
     }

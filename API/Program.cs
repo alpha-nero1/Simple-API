@@ -18,15 +18,16 @@ namespace API
             var host = CreateHostBuilder(args).Build();
             using var scope = host.Services.CreateScope();
             var services = scope.ServiceProvider;
-
             try 
             {
                 // Service locator pattern.
                 var context = services.GetRequiredService<DataContext>();
+                // Get the user manager for setup.
+                var uManager = services.GetRequiredService<UserManager<AppUser>>();
                 // Apply migration on db on start.
                 await context.Database.MigrateAsync();
                 // Seed our initial data if need be.
-                await Seed.SeedData(context);
+                await Seed.SeedData(context, uManager);
             }
             catch (Exception e)
             {
@@ -39,9 +40,10 @@ namespace API
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+                .ConfigureWebHostDefaults(builder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    builder.UseStartup<Startup>();
+                    builder.UseUrls("http://localhost:5001/");
                 });
     }
 }

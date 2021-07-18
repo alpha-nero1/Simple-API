@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Domain;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Persistence
 {
     // Our database session.
-    public class DataContext : DbContext
+    // Derive from identity db context which adds the user tables.
+    public class DataContext : IdentityDbContext<AppUser>
     {
         // Register our posts with the db.
         public DbSet<Post> Posts { get; set; }
@@ -14,6 +16,5 @@ namespace Persistence
         {
 
         }
-        
     }
 }

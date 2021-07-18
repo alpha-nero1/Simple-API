@@ -5,7 +5,7 @@ using Domain;
 using System.Collections.Generic;
 using System;
 using Application.Posts;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -18,6 +18,7 @@ namespace API.Controllers
         }
 
         // Get a single post.
+        // Is protected.
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPost(Guid id)
         {

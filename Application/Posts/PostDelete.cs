@@ -28,6 +28,7 @@ namespace Application.Posts
             public async Task<HandlerResult<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
                 Post post = await _context.Posts.FindAsync(request.Id);
+                throw new Exception("heyaaaa");
                 if (post == null) return null;
                 // Hard deletion.
                 _context.Remove(post);

@@ -69,3 +69,36 @@ To migrate you can execute this at the sln level.
 This will create Persistence.Migrations.
 
 - `dotnet ef database -h` to see what commands we can use for databases.
+
+## Infrastructure project.
+Has a dependency on the Application layer to which the API layer has a dependecy on it.
+This allows us to have an interface in the Application layer and the actual implementation in the
+infrastructure project, this keeps the Application layer clear of needing to know about http or the user
+or any auth context but still access that logic from another project. In this case we want the user from auth
+context `GetUsername()`
+- The goal here is that if we change how auth works in the layer above, then because the Application layer was never
+concerned with this, no code change is required in the App layer, only API and infrastructure.
+
+## Many to many relationships.
+dotnet has not by convention supported this. It is supported now but not recommended because the join tables
+created by ef do not accomodate extra fields on the tables.
+
+To migrate down in dotnet-ef: `dotnet ef migrations remove -p Persistence -s API`
+
+- For things that are cross-cutting concerns we can use an Infrastructure project.
+
+## Loading Related Entities.
+
+### Eager loading
+The related model is included with the model when queried using the Include() syntax.
+
+### Lazy loading
+When a related model is included with the model the first time when the property is accessed.
+- You turn it on/off at a very high level. Bit of a deal breaker.
+
+### Explicit loading.
+We can call the Load() method on the model to load the related entities. We explicitly use lazy laoding.
+
+### Projection
+Allow us to get our related models directly.
+- Allows us to create more efficient queries.

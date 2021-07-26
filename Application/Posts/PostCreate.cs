@@ -6,7 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using Application.Core;
-
+using Application.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Posts
 {
@@ -31,14 +32,30 @@ namespace Application.Posts
         public class Handler : IRequestHandler<Command, HandlerResult<Unit>>
         {
             private readonly DataContext _context;
-            
-            public Handler(DataContext context)
+            private readonly IUserAccessor _userAccessor;
+
+            public Handler(DataContext context, IUserAccessor userAccessor)
             {
                 _context = context;
+                _userAccessor = userAccessor;
             }
+
 
             public async Task<HandlerResult<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
+                // Get the current user so that we can auto-assign a post user.
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == _userAccessor.GetUsername());
+
+                var postUser = new PostUser
+                {
+                    AppUser = user,
+                    Post = request.Post,
+                    IsOwner = true
+                };
+                // This will track the post user along with the post to be created,
+                // all done via ef!
+                request.Post.PostUsers.Add(postUser);
+
                 // Just track the fact that we have added a post.
                 _context.Posts.Add(request.Post);
                 bool success = await _context.SaveChangesAsync() > 0;

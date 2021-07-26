@@ -2,7 +2,6 @@ using Persistence;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Domain;
-using System.Collections.Generic;
 using System;
 using Application.Posts;
 using Microsoft.AspNetCore.Authorization;
@@ -34,6 +33,7 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(new PostCreate.Command { Post = post }));
         }
 
+        [Authorize(Policy = "IsPostOwner")]
         [HttpPut("{id}")]
         public async Task<IActionResult> EditPost(Guid id, Post post)
         {
@@ -41,10 +41,19 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(new PostEdit.Command { Post = post }));
         }
 
+        [Authorize(Policy = "IsPostOwner")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteActivity(Guid id)
+        public async Task<IActionResult> DeletePost(Guid id)
         {
             return HandleResult(await Mediator.Send(new PostDelete.Command { Id = id }));
+        }
+
+        // Allows us to add/remove post users on a post or lets a post owner soft delete the post.
+        [Authorize(Policy = "IsPostOwner")]
+        [HttpPost("{id}/update")]
+        public async Task<IActionResult> UpdatePost(Guid id)
+        {
+            return HandleResult(await Mediator.Send(new PostUpdate.Command { Id = id }));
         }
     }
 }

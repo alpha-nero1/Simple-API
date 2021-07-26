@@ -7,6 +7,8 @@ using AutoMapper;
 using MediatR;
 using Application.Posts;
 using Application.Core;
+using Application.Interfaces;
+using Infrastructure.Security;
 
 namespace API.Extensions
 {
@@ -31,6 +33,7 @@ namespace API.Extensions
             services.AddMediatR(typeof(PostList).Assembly);
             // Add automapper and specify location of profiles.
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+            services.AddScoped<IUserAccessor, UserAccessor>();
             return services;
         }
     }

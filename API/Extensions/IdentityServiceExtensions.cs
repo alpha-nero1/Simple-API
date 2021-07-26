@@ -1,6 +1,8 @@
 ﻿using API.Services;
 using Domain;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +39,16 @@ namespace API.Extensions
                         ValidateAudience = false
                     };
                 });
+            // Add the custom IsPostOwner security policy.
+            services.AddAuthorization(opt =>
+            {
+                opt.AddPolicy("IsPostOwner", policy =>
+                {
+                    policy.Requirements.Add(new IsOwnerRequirement());
+                });
+            });
+            // Add the handler.
+            services.AddTransient<IAuthorizationHandler, IsOwnerRequirementHandler>();
             services.AddScoped<ITokenService, TokenService>();
             return services;
         }
